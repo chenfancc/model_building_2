@@ -44,7 +44,7 @@ class TrainModel:
 
         for epoch in range(EPOCH):
             print(f"---------------------------------------"
-                  f"Epoch: {epoch}"
+                  f"Epoch: {epoch+1}"
                   f"---------------------------------------")
             train_loss = self.train_one_epoch()
             train_total_loss.extend(train_loss)
@@ -65,10 +65,10 @@ class TrainModel:
                 specificity_list_auc.append(specificity_auc)
                 alarm_sen_list_auc.append(alarm_sen_auc)
                 alarm_acc_list_auc.append(alarm_acc_auc)
-                accuracy_list_prc.append(accuracy_auc)
-                specificity_list_prc.append(specificity_auc)
-                alarm_sen_list_prc.append(alarm_sen_auc)
-                alarm_acc_list_prc.append(alarm_acc_auc)
+                accuracy_list_prc.append(accuracy_prc)
+                specificity_list_prc.append(specificity_prc)
+                alarm_sen_list_prc.append(alarm_sen_prc)
+                alarm_acc_list_prc.append(alarm_acc_prc)
                 auc_list.append(auc)
                 prc_list.append(prc)
 
