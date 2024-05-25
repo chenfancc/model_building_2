@@ -224,6 +224,6 @@ class TrainModel:
         print(f"Accuracy: {valid_accuracy:.2f}")
 
         # 绘制混淆矩阵
-        plot_confusion_matrix(self.model_name, epoch, cm, classes=['Survive', 'Death'])
+        plot_confusion_matrix(self.model_name, name, epoch, cm, classes=['Survive', 'Death'])
 
         return valid_accuracy, valid_specificity, valid_alarm_sen, valid_alarm_acc
