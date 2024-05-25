@@ -114,8 +114,8 @@ class TrainModel:
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
             self.optimizer.zero_grad()
-            outputs = self.model(inputs)
-            loss = self.criterion(outputs, labels)
+            outputs = self.model(inputs.float())
+            loss = self.criterion(outputs, labels.float())
             loss.backward()
             self.optimizer.step()
 
@@ -145,7 +145,7 @@ class TrainModel:
             for inputs, targets in self.valid_dataloader:
                 count += 1
                 inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
-                outputs = self.model(inputs)
+                outputs = self.model(inputs.float())
                 true_labels.append(targets.cpu().numpy())
                 predicted_probs.append(outputs.cpu().numpy())
                 loss = self.criterion(outputs, targets.float())
@@ -172,7 +172,7 @@ class TrainModel:
         best_threshold_index = (tpr - fpr).argmax()
         best_threshold = thresholds[best_threshold_index]
 
-        print(f"AUC: {valid_auc:.2f}")
+        print(f"AUROC: {valid_auc:.2f}")
         print(f"Best threshold: {best_threshold:.2f}")
         # 绘制ROC曲线
         plt.figure()
@@ -194,7 +194,7 @@ class TrainModel:
         prc_auc = auc(recall, precision)
         best_threshold_index = (precision * recall / (precision + recall + 1e-6)).argmax()
         best_threshold = thresholds[best_threshold_index]
-        print(f"AUC: {prc_auc:.2f}")
+        print(f"AUPRC: {prc_auc:.2f}")
         print(f"Best threshold: {best_threshold:.2f}")
 
         plt.figure()

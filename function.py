@@ -6,7 +6,7 @@ from hyperparameters import *
 from sampled import BalancedData
 
 
-def plot_confusion_matrix(model_name, idx, cm, classes, normalize=False, title='混淆矩阵', cmap=plt.cm.Blues):
+def plot_confusion_matrix(model_name, idx, cm, classes, normalize=False, title='CM', cmap=plt.cm.Blues):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -25,7 +25,7 @@ def plot_confusion_matrix(model_name, idx, cm, classes, normalize=False, title='
 
     plt.figure(figsize=(8, 6))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
+    plt.title(f"{title}_{idx+1}")
     plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)

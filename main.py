@@ -1,21 +1,20 @@
-from function import main_data_loader
+from function import *
 from model_trainer import TrainModel
+import numpy as np
 from model import *
+from function import plot_info
 
-BATCH_SIZE = 256
-EPOCH = 50
-LR = 1e-4
-GAMMA = 0.5
-STEP_SIZE = 5  # 每隔多少个 epoch 衰减一次学习率
-DECAY = 1e-4
-DEVICE = "cuda"
-SAMPLE_METHOD = "undersample"
+# 设置随机种子
+seed = 42
+np.random.seed(seed)
+torch.manual_seed(seed)
 
 if __name__ == '__main__':
     for i in [20, 24, 30, 36, 48]:
-        tensor_direction = f""
-        train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
-        model = BiLSTM_BN
-        model_name = f"{model.__name__}_best_model_{SAMPLE_METHOD}sample_{i}"
-        trainer = TrainModel(model_name, train_dataloader, val_dataloader)
-        trainer.train()
+        for model in [BiLSTM, BiLSTM_BN, BiLSTM_BN_Resnet, BiLSTM_BN_3layers]:
+            tensor_direction =f'E:\deeplearning\Model_building\data_label_1/data_tensor_{i}.pth'
+            train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
+            model_name = f"{model.__name__}_best_model_{SAMPLE_METHOD}_{i}"
+            trainer = TrainModel(model_name, model, train_dataloader, val_dataloader)
+            info = trainer.train()
+            plot_info(info, model_name)
