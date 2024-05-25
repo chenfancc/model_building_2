@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 from torch.utils.data import TensorDataset, DataLoader
 from hyperparameters import *
 from sampled import BalancedData
-
+import torch.nn as nn
+import torch.nn.functional as F
 
 def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, title='CM', cmap=plt.cm.Blues):
     """
@@ -174,3 +175,44 @@ def plot_info(info, model_name):
     plt.grid()
     plt.savefig(f'{model_name}/06_prc_curve.png')
     plt.close()
+
+    plt.figure()
+    plt.plot(epochs, info['brier_list'], label='PRC AUC')
+    plt.xlabel('Epochs')
+    plt.ylabel('PRC')
+    plt.title('Brier Score over Epochs')
+    plt.legend()
+    plt.grid()
+    plt.savefig(f'{model_name}/07_brier_score.png')
+    plt.close()
+
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=1, gamma=2, reduction='mean'):
+        """
+        Focal Loss
+        :param alpha: 平衡因子
+        :param gamma: 调整因子
+        :param reduction: 指定应用于输出的减少方式: 'none' | 'mean' | 'sum'
+        """
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+
+    def forward(self, inputs, targets):
+        """
+        前向传播计算损失
+        :param inputs: 预测值 (logits)
+        :param targets: 实际标签
+        :return: 计算后的 Focal Loss
+        """
+        BCE_loss = F.binary_cross_entropy_with_logits(inputs, targets, reduction='none')
+        pt = torch.exp(-BCE_loss)  # 计算 pt
+        F_loss = self.alpha * (1 - pt) ** self.gamma * BCE_loss
+
+        if self.reduction == 'mean':
+            return F_loss.mean()
+        elif self.reduction == 'sum':
+            return F_loss.sum()
+        else:
+            return F_loss

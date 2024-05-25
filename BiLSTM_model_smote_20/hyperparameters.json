@@ -1,0 +1,8 @@
+{
+    "BATCH_SIZE": 256,
+    "EPOCH": 30,
+    "LEARNING_RATE": 0.0001,
+    "GAMMA": 0.5,
+    "STEP_SIZE": 30,
+    "device": "cuda"
+}

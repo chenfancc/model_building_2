@@ -21,7 +21,7 @@ class TrainModel:
         self.valid_dataloader = valid_loader
         self.test_dataloader = test_loader
         self.optimizer = optimizer_class(self.model.parameters(), lr=LR, weight_decay=DECAY)
-        self.criterion = criterion_class()
+        self.criterion = criterion_class(ALPHA_LOSS, GAMMA_LOSS)
         self.scheduler = scheduler_class(self.optimizer, step_size=STEP_SIZE, gamma=GAMMA)
         self.best_model = best_model
         self.valid = valid
@@ -41,6 +41,7 @@ class TrainModel:
         alarm_acc_list_prc = []
         auc_list = []
         prc_list = []
+        brier_list = []
 
         for epoch in range(EPOCH):
             print(f"---------------------------------------"
@@ -59,7 +60,7 @@ class TrainModel:
 
             if self.valid_dataloader:
                 (loss, accuracy_auc, specificity_auc, alarm_sen_auc, alarm_acc_auc,
-                 accuracy_prc, specificity_prc, alarm_sen_prc, alarm_acc_prc, auc, prc) = self.validate(epoch)
+                 accuracy_prc, specificity_prc, alarm_sen_prc, alarm_acc_prc, auc, prc, brier) = self.validate(epoch)
                 val_loss_list.append(loss)
                 accuracy_list_auc.append(accuracy_auc)
                 specificity_list_auc.append(specificity_auc)
@@ -71,6 +72,7 @@ class TrainModel:
                 alarm_acc_list_prc.append(alarm_acc_prc)
                 auc_list.append(auc)
                 prc_list.append(prc)
+                brier_list.append(brier)
 
             self.scheduler.step()
 
@@ -87,7 +89,8 @@ class TrainModel:
             "alarm_sen_list_prc": alarm_sen_list_prc,
             "alarm_acc_list_prc": alarm_acc_list_prc,
             "roc_auc_list": auc_list,
-            "prc_auc_list": prc_list
+            "prc_auc_list": prc_list,
+            "brier_list": brier_list
         }
         # Save hyperparameters
         hyperparameters = {
@@ -156,6 +159,8 @@ class TrainModel:
             true_labels_flat = np.concatenate(true_labels)
             predicted_probs_flat = np.concatenate(predicted_probs)
 
+            brier_score = np.mean((predicted_probs_flat - true_labels_flat) ** 2)
+
             valid_auc, best_threshold_auc = self._plot_roc_curve(true_labels_flat, predicted_probs_flat, epoch)
             valid_prc, best_threshold_prc = self._plot_prc_curve(true_labels_flat, predicted_probs_flat, epoch)
             valid_accuracy_auc, valid_specificity_auc, valid_alarm_sen_auc, valid_alarm_acc_auc = self._calculate_criterion(
@@ -164,7 +169,8 @@ class TrainModel:
                 true_labels_flat, predicted_probs_flat, best_threshold_prc, epoch, "prc")
 
         return (valid_loss, valid_accuracy_auc, valid_specificity_auc, valid_alarm_sen_auc, valid_alarm_acc_auc,
-                valid_accuracy_prc, valid_specificity_prc, valid_alarm_sen_prc, valid_alarm_acc_prc, valid_auc, valid_prc)
+                valid_accuracy_prc, valid_specificity_prc, valid_alarm_sen_prc, valid_alarm_acc_prc,
+                valid_auc, valid_prc, brier_score)
 
     def _plot_roc_curve(self, true_labels_flat, predicted_probs_flat, epoch):
         fpr, tpr, thresholds = roc_curve(true_labels_flat, predicted_probs_flat)

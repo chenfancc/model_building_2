@@ -1,5 +1,6 @@
 import torch
-
+from imblearn.over_sampling import SMOTE
+from hyperparameters import *
 
 class BalancedData:
     def __init__(self, data, labels):
@@ -47,8 +48,29 @@ class BalancedData:
         return data_balanced, labels_balanced
 
     def smote(self):
-        data_balanced = self.data
-        labels_balanced = self.labels
+        """
+        过采样
+        :param data: 数据
+        :param label: 标签
+        :return: 平衡后的数据和标签
+        """
+        data_numpy = self.data.numpy()
+        labels_numpy = self.labels.numpy()
+
+        # 获取数据的形状
+        original_shape = data_numpy.shape
+
+        # 将数据重塑为二维
+        data_reshaped = data_numpy.reshape(original_shape[0], -1)
+
+        smote = SMOTE(random_state=42)
+        data_resampled, labels_resampled = smote.fit_resample(data_reshaped, labels_numpy)
+
+        # 将数据重塑回原来的形状
+        data_resampled = data_resampled.reshape(-1, *original_shape[1:])
+
+        data_balanced = torch.from_numpy(data_resampled)
+        labels_balanced = torch.from_numpy(labels_resampled)
         return data_balanced, labels_balanced
 
     def origin(self):
