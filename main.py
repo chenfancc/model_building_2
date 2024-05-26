@@ -9,13 +9,13 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 
 if __name__ == '__main__':
-    # for i in [20, 24, 30, 36, 48]:
-    for i in [20]:
+    for SAMPLE_METHOD in ["undersample", "smote"]:
         for model in [BiLSTM_BN, BiLSTM, BiLSTM_BN_Resnet, BiLSTM_BN_3layers]:
-            tensor_direction =f'E:\deeplearning\Model_building\data_label_1/data_tensor_{i}.pth'
-            train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
-            model_name = f"{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_2_{i}"
-            trainer = TrainModel(model_name, model, train_dataloader, val_dataloader,
-                                 criterion_class=FocalLoss)
-            info = trainer.train()
-            plot_info(info, model_name)
+            for i in [20, 24, 30, 36, 48]:
+                tensor_direction =f'E:\deeplearning\Model_building\data_label_1/data_tensor_{i}.pth'
+                train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
+                model_name = f"{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{i}"
+                trainer = TrainModel(model_name, model, train_dataloader, val_dataloader,
+                                     criterion_class=FocalLoss)
+                info = trainer.train()
+                plot_info(info, model_name)

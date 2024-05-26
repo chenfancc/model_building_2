@@ -112,10 +112,10 @@ def plot_info(info, model_name):
     plt.plot(epochs, info['val_loss_list'], label='Validation Loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.title('Train and Validation Loss')
+    plt.title(f'Train and Validation Loss of {model_name}')
     plt.legend()
     plt.savefig(f'{model_name}/02_loss_curve.png')
-    plt.close()
+    plt.show()
 
     # 绘制各个指标
     plt.figure()
@@ -150,7 +150,7 @@ def plot_info(info, model_name):
     plt.plot(epochs, info['prc_auc_list'], label='PRC AUC')
     plt.xlabel('Epochs')
     plt.ylabel('AUC')
-    plt.title('AUC over Epochs')
+    plt.title(f'AUC of {model_name}')
     plt.legend()
     plt.grid()
     plt.savefig(f'{model_name}/05_auc_curve.png')

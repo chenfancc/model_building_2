@@ -1,6 +1,5 @@
 import torch
 from imblearn.over_sampling import SMOTE
-from hyperparameters import *
 
 class BalancedData:
     def __init__(self, data, labels):
@@ -9,6 +8,10 @@ class BalancedData:
         pass
 
     def oversample(self):
+        """
+        未完成
+        :return:
+        """
         data_balanced = self.data
         labels_balanced = self.labels
         return data_balanced, labels_balanced
@@ -16,8 +19,6 @@ class BalancedData:
     def undersample(self):
         """
         欠采样
-        :param data: 数据
-        :param label: 标签
         :return: 平衡后的数据和标签
         """
         # 找到正类和负类的索引
