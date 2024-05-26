@@ -16,6 +16,6 @@ if __name__ == '__main__':
                 train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
                 model_name = f"{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{i}"
                 trainer = TrainModel(model_name, model, train_dataloader, val_dataloader,
-                                     criterion_class=FocalLoss)
+                                     criterion_class=FocalLoss(ALPHA_LOSS, GAMMA_LOSS))
                 info = trainer.train()
                 plot_info(info, model_name)

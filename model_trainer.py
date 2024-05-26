@@ -21,7 +21,7 @@ class TrainModel:
         self.valid_dataloader = valid_loader
         self.test_dataloader = test_loader
         self.optimizer = optimizer_class(self.model.parameters(), lr=LR, weight_decay=DECAY)
-        self.criterion = criterion_class(ALPHA_LOSS, GAMMA_LOSS)
+        self.criterion = criterion_class
         self.scheduler = scheduler_class(self.optimizer, step_size=STEP_SIZE, gamma=GAMMA)
         self.best_model = best_model
         self.valid = valid
