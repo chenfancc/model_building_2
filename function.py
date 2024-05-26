@@ -187,7 +187,7 @@ def plot_info(info, model_name):
     plt.close()
 
 class FocalLoss(nn.Module):
-    def __init__(self, alpha=1, gamma=2, reduction='mean'):
+    def __init__(self, alpha=1, gamma=3, reduction='mean'):
         """
         Focal Loss
         :param alpha: 平衡因子

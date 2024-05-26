@@ -100,6 +100,10 @@ class TrainModel:
             "GAMMA": GAMMA,
             "STEP_SIZE": STEP_SIZE,
             "device": DEVICE,
+            "SAMPLE_METHOD": SAMPLE_METHOD,
+            "SEED": SEED,
+            "ALPHA_LOSS": ALPHA_LOSS,
+            "GAMMA_LOSS": GAMMA_LOSS
         }
         with open(f'./{self.model_name}/hyperparameters.json', 'w') as json_file:
             json.dump(hyperparameters, json_file, indent=4)
