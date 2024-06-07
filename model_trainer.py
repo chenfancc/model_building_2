@@ -100,7 +100,6 @@ class TrainModel:
             "GAMMA": GAMMA,
             "STEP_SIZE": STEP_SIZE,
             "device": DEVICE,
-            "SAMPLE_METHOD": SAMPLE_METHOD,
             "SEED": SEED,
             "ALPHA_LOSS": ALPHA_LOSS,
             "GAMMA_LOSS": GAMMA_LOSS
@@ -182,11 +181,11 @@ class TrainModel:
         best_threshold_index = (tpr - fpr).argmax()
         best_threshold = thresholds[best_threshold_index]
 
-        print(f"AUROC: {valid_auc:.2f}")
-        print(f"Best threshold: {best_threshold:.2f}")
+        print(f"AUROC: {valid_auc:.4f}")
+        print(f"Best threshold: {best_threshold:.4f}")
         # 绘制ROC曲线
         plt.figure()
-        plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {valid_auc:.2f})')
+        plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {valid_auc:.4f})')
         plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.05])
@@ -204,11 +203,11 @@ class TrainModel:
         prc_auc = auc(recall, precision)
         best_threshold_index = (precision * recall / (precision + recall + 1e-6)).argmax()
         best_threshold = thresholds[best_threshold_index]
-        print(f"AUPRC: {prc_auc:.2f}")
-        print(f"Best threshold: {best_threshold:.2f}")
+        print(f"AUPRC: {prc_auc:.4f}")
+        print(f"Best threshold: {best_threshold:.4f}")
 
         plt.figure()
-        plt.plot(recall, precision, color='darkorange', lw=2, label=f'PRC curve (area = {prc_auc:.2f})')
+        plt.plot(recall, precision, color='darkorange', lw=2, label=f'PRC curve (area = {prc_auc:.4f})')
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.05])
         plt.xlabel('Recall')
@@ -228,10 +227,10 @@ class TrainModel:
         print(name)
         print("Confusion Matrix:")
         print(cm)
-        print(f"Specificity: {valid_specificity:.2f}")
-        print(f"Sensitivity: {valid_alarm_sen:.2f}")
-        print(f"Alarm Accuracy: {valid_alarm_acc:.2f}")
-        print(f"Accuracy: {valid_accuracy:.2f}")
+        print(f"Specificity: {valid_specificity:.4f}")
+        print(f"Sensitivity: {valid_alarm_sen:.4f}")
+        print(f"Alarm Accuracy: {valid_alarm_acc:.4f}")
+        print(f"Accuracy: {valid_accuracy:.4f}")
 
         # 绘制混淆矩阵
         plot_confusion_matrix(self.model_name, name, epoch, cm, classes=['Survive', 'Death'])

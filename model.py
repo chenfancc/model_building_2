@@ -1,11 +1,13 @@
 import torch
 from torch import nn
 
+from hyperparameters import Feature_number
+
 
 class BiLSTM(nn.Module):
     def __init__(self):
         super(BiLSTM, self).__init__()
-        self.lstm = nn.LSTM(input_size=7, hidden_size=128, num_layers=2, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True, bidirectional=True)
         self.bn = nn.BatchNorm1d(256)
         self.fc1 = nn.Linear(256, 128)
         self.fc2 = nn.Linear(128, 64)
@@ -41,7 +43,7 @@ class BiLSTM(nn.Module):
 class BiLSTM_BN(nn.Module):
     def __init__(self):
         super(BiLSTM_BN, self).__init__()
-        self.lstm = nn.LSTM(input_size=7, hidden_size=128, num_layers=2, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True, bidirectional=True)
         self.bn = nn.BatchNorm1d(256)
 
         self.fc1 = nn.Linear(256, 128)
@@ -92,10 +94,64 @@ class BiLSTM_BN(nn.Module):
         return output.squeeze(1).to(x.device)
 
 
+class BiLSTM_BN_larger(nn.Module):
+    def __init__(self):
+        super(BiLSTM_BN_larger, self).__init__()
+        self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=256, num_layers=2, batch_first=True, bidirectional=True)
+        self.bn = nn.BatchNorm1d(512)
+
+        self.fc1 = nn.Linear(512, 128)
+        self.relu1 = nn.ReLU()  # ReLU激活函数
+        self.bn1 = nn.BatchNorm1d(128)  # 批标准化层
+
+        self.fc2 = nn.Linear(128, 64)
+        self.relu2 = nn.ReLU()  # ReLU激活函数
+        self.bn2 = nn.BatchNorm1d(64)  # 批标准化层
+
+        self.fc3 = nn.Linear(64, 32)
+        self.relu3 = nn.ReLU()  # ReLU激活函数
+        self.bn3 = nn.BatchNorm1d(32)  # 批标准化层
+
+        self.fc4 = nn.Linear(32, 8)
+        self.relu4 = nn.ReLU()  # ReLU激活函数
+        self.bn4 = nn.BatchNorm1d(8)  # 批标准化层
+
+        self.fc5 = nn.Linear(8, 1)
+
+    def forward(self, x):
+        # print(x.shape)
+        h0 = torch.zeros(4, x.size(0), 256).to(x.device)
+        c0 = torch.zeros(4, x.size(0), 256).to(x.device)
+        output, _ = self.lstm(x, (h0, c0))
+        output = output[:, -1, :]  # 取最后一个时间步的隐藏状态
+        output = self.bn(output)
+
+        output = self.fc1(output)
+        output = self.bn1(output)
+        output = self.relu1(output)
+
+        output = self.fc2(output)
+        output = self.bn2(output)
+        output = self.relu2(output)
+
+        output = self.fc3(output)
+        output = self.bn3(output)
+        output = self.relu3(output)
+
+        output = self.fc4(output)
+        output = self.bn4(output)
+        output = self.relu4(output)
+
+        output = self.fc5(output)
+        output = torch.sigmoid(output)
+
+        return output.squeeze(1).to(x.device)
+
+
 class BiLSTM_BN_Resnet(nn.Module):
     def __init__(self):
         super(BiLSTM_BN_Resnet, self).__init__()
-        self.lstm = nn.LSTM(input_size=7, hidden_size=128, num_layers=2, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True, bidirectional=True)
         self.bn = nn.BatchNorm1d(256)
 
         self.fc1_1 = nn.Linear(256, 256)
@@ -167,7 +223,7 @@ class BiLSTM_BN_Resnet(nn.Module):
 class BiLSTM_BN_3layers(nn.Module):
     def __init__(self):
         super(BiLSTM_BN_3layers, self).__init__()
-        self.lstm = nn.LSTM(input_size=7, hidden_size=512, num_layers=3, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=512, num_layers=3, batch_first=True, bidirectional=True)
         self.bn = nn.BatchNorm1d(1024)
 
         self.fc1 = nn.Linear(1024, 512)
@@ -193,6 +249,58 @@ class BiLSTM_BN_3layers(nn.Module):
         h0 = torch.zeros(6, x.size(0), 512).to(x.device)
         c0 = torch.zeros(6, x.size(0), 512).to(x.device)
         output, _ = self.lstm(x, (h0, c0))
+        output = output[:, -1, :]  # 取最后一个时间步的隐藏状态
+        output = self.bn(output)
+
+        output = self.fc1(output)
+        output = self.bn1(output)
+        output = self.relu1(output)
+
+        output = self.fc2(output)
+        output = self.bn2(output)
+        output = self.relu2(output)
+
+        output = self.fc3(output)
+        output = self.bn3(output)
+        output = self.relu3(output)
+
+        output = self.fc4(output)
+        output = self.bn4(output)
+        output = self.relu4(output)
+
+        output = self.fc5(output)
+        output = torch.sigmoid(output)
+
+        return output.squeeze(1).to(x.device)
+
+class GRU_BN(nn.Module):
+    def __init__(self):
+        super(GRU_BN, self).__init__()
+        self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)
+        self.bn = nn.BatchNorm1d(1024)
+
+        self.fc1 = nn.Linear(1024, 512)
+        self.relu1 = nn.ReLU()  # ReLU激活函数
+        self.bn1 = nn.BatchNorm1d(512)  # 批标准化层
+
+        self.fc2 = nn.Linear(512, 128)
+        self.relu2 = nn.ReLU()  # ReLU激活函数
+        self.bn2 = nn.BatchNorm1d(128)  # 批标准化层
+
+        self.fc3 = nn.Linear(128, 64)
+        self.relu3 = nn.ReLU()  # ReLU激活函数
+        self.bn3 = nn.BatchNorm1d(64)  # 批标准化层
+
+        self.fc4 = nn.Linear(64, 16)
+        self.relu4 = nn.ReLU()  # ReLU激活函数
+        self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
+
+        self.fc5 = nn.Linear(16, 1)
+
+    def forward(self, x):
+        h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
+
+        output, _ = self.gru(x, h0)
         output = output[:, -1, :]  # 取最后一个时间步的隐藏状态
         output = self.bn(output)
 

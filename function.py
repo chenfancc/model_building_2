@@ -32,7 +32,7 @@ def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, t
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
 
-    fmt = '.2f' if normalize else 'd'
+    fmt = '.4f' if normalize else 'd'
     thresh = cm.max() / 2.
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
@@ -158,6 +158,7 @@ def plot_info(info, model_name):
 
     plt.figure()
     plt.plot(epochs, info['roc_auc_list'], label='ROC AUC')
+    plt.ylim([0.75, 0.90])
     plt.xlabel('Epochs')
     plt.ylabel('ROC')
     plt.title('ROC over Epochs')
@@ -177,9 +178,9 @@ def plot_info(info, model_name):
     plt.close()
 
     plt.figure()
-    plt.plot(epochs, info['brier_list'], label='PRC AUC')
+    plt.plot(epochs, info['brier_list'], label='Brier_score')
     plt.xlabel('Epochs')
-    plt.ylabel('PRC')
+    plt.ylabel('Brier_score')
     plt.title('Brier Score over Epochs')
     plt.legend()
     plt.grid()

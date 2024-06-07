@@ -1,11 +1,11 @@
 BATCH_SIZE = 256
-EPOCH = 100
-LR = 1e-5
-GAMMA = 0.9
-STEP_SIZE = 10  # 每隔多少个 epoch 衰减一次学习率
+EPOCH = 1000
+LR = 2e-5
+GAMMA = 0.95
+STEP_SIZE = 20  # 每隔多少个 epoch 衰减一次学习率
 DECAY = 1e-4
 DEVICE = "cuda"
-SAMPLE_METHOD = "smote"
 SEED = 42
 ALPHA_LOSS = 1
 GAMMA_LOSS = 3
+Feature_number = 5
