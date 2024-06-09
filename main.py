@@ -57,7 +57,7 @@ torch.manual_seed(SEED)
 #             plot_info(info, model_name)
 
 if __name__ == '__main__':
-    for SAMPLE_METHOD in ["undersample", "origin", "oversample"]:
+    for SAMPLE_METHOD in ["origin"]:
         for model in [GRU_BN, GRU_BN_3layers, GRU_BN_4layers, RNN_BN, RNN_BN_3layers, RNN_BN_4layers, BiLSTM_BN_ResBlock, GRU_BN_ResBlock, RNN_BN_ResBlock]:
             tensor_direction = f'E:\deeplearning\Zhongda\data_tensor_zhongda.pth'
             train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
