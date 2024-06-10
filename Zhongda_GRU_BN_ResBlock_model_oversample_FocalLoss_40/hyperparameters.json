@@ -1,0 +1,11 @@
+{
+    "BATCH_SIZE": 512,
+    "EPOCH": 40,
+    "LEARNING_RATE": 1e-06,
+    "GAMMA": 0.95,
+    "STEP_SIZE": 20,
+    "device": "cuda",
+    "SEED": 42,
+    "ALPHA_LOSS": 1,
+    "GAMMA_LOSS": 3
+}
