@@ -1,6 +1,6 @@
 BATCH_SIZE = 512
-EPOCH = 40
-LR = 1e-6
+EPOCH = 100
+LR = 1e-5
 GAMMA = 0.95
 STEP_SIZE = 20  # 每隔多少个 epoch 衰减一次学习率
 DECAY = 1e-4

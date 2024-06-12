@@ -756,3 +756,61 @@ class Custom(nn.Module):
         x = self.fc5(x)
         return torch.zeros(x.shape[0],).to(x.device)
 
+
+class BiLSTM_BN_single(nn.Module):
+    def __init__(self):
+        super(BiLSTM_BN_single, self).__init__()
+        self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=3, batch_first=True,
+                            bidirectional=True)
+        self.bn = nn.BatchNorm1d(256)
+        self.fc5 = nn.Linear(256, 1)
+
+    def forward(self, x):
+        # print(x.shape)
+        h0 = torch.zeros(6, x.size(0), 128).to(x.device)
+        c0 = torch.zeros(6, x.size(0), 128).to(x.device)
+        output, _ = self.lstm(x, (h0, c0))
+        output = output[:, -1, :]  # 取最后一个时间步的隐藏状态
+        output = self.bn(output)
+        output = self.fc5(output)
+        output = torch.sigmoid(output)
+
+        return output.squeeze(1).to(x.device)
+
+
+class GRU_BN_single(nn.Module):
+    def __init__(self):
+        super(GRU_BN_single, self).__init__()
+        self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)
+        self.bn = nn.BatchNorm1d(1024)
+        self.fc5 = nn.Linear(1024, 1)
+
+    def forward(self, x):
+        h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
+
+        output, _ = self.gru(x, h0)
+        output = output[:, -1, :]  # 取最后一个时间步的隐藏状态
+        output = self.bn(output)
+        output = self.fc5(output)
+        output = torch.sigmoid(output)
+
+        return output.squeeze(1).to(x.device)
+
+
+class RNN_BN_single(nn.Module):
+    def __init__(self):
+        super(RNN_BN_single, self).__init__()
+        self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)  # 修改此处
+        self.bn = nn.BatchNorm1d(1024)
+        self.fc5 = nn.Linear(1024, 1)
+
+    def forward(self, x):
+        h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
+
+        output, _ = self.rnn(x, h0)
+        output = output[:, -1, :]  # 取最后一个时间步的隐藏状态
+        output = self.bn(output)
+        output = self.fc5(output)
+        output = torch.sigmoid(output)
+
+        return output.squeeze(1).to(x.device)
