@@ -57,9 +57,7 @@ torch.manual_seed(SEED)
 #             plot_info(info, model_name)
 
 if __name__ == '__main__':
-    for SAMPLE_METHOD in ["undersample"
-        # , "origin", "smote", "oversample"
-                          ]:
+    for SAMPLE_METHOD in ["undersample", "origin", "smote", "oversample"]:
         for model in [BiLSTM_BN_single, GRU_BN_single, RNN_BN_single]:
             tensor_direction = f'E:\deeplearning\Zhongda\data_tensor_zhongda.pth'
             train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
@@ -68,6 +66,7 @@ if __name__ == '__main__':
                                  criterion_class=FocalLoss(ALPHA_LOSS, GAMMA_LOSS))
             info = trainer.train()
             plot_info(info, model_name)
+
 
 # if __name__ == '__main__':
 #     for SAMPLE_METHOD in ["undersample"]:

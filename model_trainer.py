@@ -14,7 +14,7 @@ from hyperparameters import *
 class TrainModel:
     def __init__(self, my_model_name, model, train_loader, valid_loader=None, test_loader=None,
                  optimizer_class=torch.optim.Adam, criterion_class=nn.BCELoss, scheduler_class=StepLR,
-                 best_model=True, valid=True):
+                 best_model=True, valid=True, save_model_index=None):
         self.model_name = my_model_name
         self.model = model()
         self.train_dataloader = train_loader
@@ -25,7 +25,9 @@ class TrainModel:
         self.scheduler = scheduler_class(self.optimizer, step_size=STEP_SIZE, gamma=GAMMA)
         self.best_model = best_model
         self.valid = valid
+        self.save_model_index = save_model_index
         self.model.to(DEVICE)
+        self.saved_num=0
 
     def train(self):
         train_total_loss = []
@@ -42,6 +44,7 @@ class TrainModel:
         auc_list = []
         prc_list = []
         brier_list = []
+        info = {}
 
         for epoch in range(EPOCH):
             print(f"---------------------------------------"
@@ -55,10 +58,14 @@ class TrainModel:
             model_directory = f"./{self.model_name}/"
             if not os.path.exists(model_directory):
                 os.makedirs(model_directory)
-            # torch.save(self.model.state_dict(), f'{model_directory}/model_{epoch}.pth')
-            print(f'Model saved to {model_directory}/model_{epoch}')
+            if self.save_model_index and (epoch + 1) in self.save_model_index:
+                torch.save(self.model.state_dict(), f'zzz_saved_model/{self.model_name}_model_{epoch+1}.pth')
+                print(f'zzz_saved_model/{self.model_name}_model_{epoch}')
+                self.saved_num += 1
+                if self.saved_num == len(self.save_model_index):
+                    break
 
-            if self.valid_dataloader:
+            if self.valid:
                 (loss, accuracy_auc, specificity_auc, alarm_sen_auc, alarm_acc_auc,
                  accuracy_prc, specificity_prc, alarm_sen_prc, alarm_acc_prc, auc, prc, brier) = self.validate(epoch)
                 val_loss_list.append(loss)
@@ -74,40 +81,40 @@ class TrainModel:
                 prc_list.append(prc)
                 brier_list.append(brier)
 
-            self.scheduler.step()
+                info = {
+                    "train_total_loss": train_total_loss,
+                    "train_loss_list": train_loss_list,
+                    "val_loss_list": val_loss_list,
+                    "accuracy_list_auc": accuracy_list_auc,
+                    "specificity_list_auc": specificity_list_auc,
+                    "alarm_sen_list_auc": alarm_sen_list_auc,
+                    "alarm_acc_list_auc": alarm_acc_list_auc,
+                    "accuracy_list_prc": accuracy_list_prc,
+                    "specificity_list_prc": specificity_list_prc,
+                    "alarm_sen_list_prc": alarm_sen_list_prc,
+                    "alarm_acc_list_prc": alarm_acc_list_prc,
+                    "roc_auc_list": auc_list,
+                    "prc_auc_list": prc_list,
+                    "brier_list": brier_list
+                }
+                # Save hyperparameters
+                hyperparameters = {
+                    "BATCH_SIZE": BATCH_SIZE,
+                    "EPOCH": EPOCH,
+                    "LEARNING_RATE": LR,
+                    "GAMMA": GAMMA,
+                    "STEP_SIZE": STEP_SIZE,
+                    "device": DEVICE,
+                    "SEED": SEED,
+                    "ALPHA_LOSS": ALPHA_LOSS,
+                    "GAMMA_LOSS": GAMMA_LOSS
+                }
+                with open(f'./{self.model_name}/hyperparameters.json', 'w') as json_file:
+                    json.dump(hyperparameters, json_file, indent=4)
+                with open(f'./{self.model_name}/info.json', 'w') as json_file:
+                    json.dump(info, json_file, indent=4)
 
-        info = {
-            "train_total_loss": train_total_loss,
-            "train_loss_list": train_loss_list,
-            "val_loss_list": val_loss_list,
-            "accuracy_list_auc": accuracy_list_auc,
-            "specificity_list_auc": specificity_list_auc,
-            "alarm_sen_list_auc": alarm_sen_list_auc,
-            "alarm_acc_list_auc": alarm_acc_list_auc,
-            "accuracy_list_prc": accuracy_list_prc,
-            "specificity_list_prc": specificity_list_prc,
-            "alarm_sen_list_prc": alarm_sen_list_prc,
-            "alarm_acc_list_prc": alarm_acc_list_prc,
-            "roc_auc_list": auc_list,
-            "prc_auc_list": prc_list,
-            "brier_list": brier_list
-        }
-        # Save hyperparameters
-        hyperparameters = {
-            "BATCH_SIZE": BATCH_SIZE,
-            "EPOCH": EPOCH,
-            "LEARNING_RATE": LR,
-            "GAMMA": GAMMA,
-            "STEP_SIZE": STEP_SIZE,
-            "device": DEVICE,
-            "SEED": SEED,
-            "ALPHA_LOSS": ALPHA_LOSS,
-            "GAMMA_LOSS": GAMMA_LOSS
-        }
-        with open(f'./{self.model_name}/hyperparameters.json', 'w') as json_file:
-            json.dump(hyperparameters, json_file, indent=4)
-        with open(f'./{self.model_name}/info.json', 'w') as json_file:
-            json.dump(info, json_file, indent=4)
+            self.scheduler.step()
 
         return info
 
