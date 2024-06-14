@@ -1,13 +1,13 @@
 import json
 import os
-
-from function import calculate_metrics, plot_confusion_matrix
+import matplotlib.pyplot as plt
 import numpy as np
 import torch.optim
 from sklearn.metrics import *
-import matplotlib.pyplot as plt
 from torch import nn
 from torch.optim.lr_scheduler import StepLR
+
+from function import calculate_metrics, plot_confusion_matrix
 
 
 class TrainModel:
