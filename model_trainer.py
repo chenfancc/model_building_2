@@ -62,7 +62,7 @@ class TrainModel:
                 torch.save(self.model.state_dict(), f'zzz_saved_model/{self.model_name}_model_{epoch+1}.pth')
                 print(f'zzz_saved_model/{self.model_name}_model_{epoch}')
                 self.saved_num += 1
-                if self.saved_num == len(self.save_model_index):
+                if self.saved_num == len(self.save_model_index) and self.valid:
                     break
 
             if self.valid:
@@ -129,6 +129,7 @@ class TrainModel:
             self.optimizer.zero_grad()
             outputs = self.model(inputs.float())
             loss = self.criterion(outputs, labels.float())
+            # print(loss.item())
             loss.backward()
             self.optimizer.step()
 
