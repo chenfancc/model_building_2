@@ -1,7 +1,9 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
 from sklearn.metrics import roc_auc_score, average_precision_score
+from torch.utils.data import TensorDataset, DataLoader
 
 
 class VotingEnsemble(nn.Module):
@@ -30,16 +32,24 @@ class VotingEnsemble(nn.Module):
             raise ValueError("voting_type must be 'soft' or 'hard'")
 
 
-def evaluate_model_auc(model, X, y):
+def evaluate_model_auc(model, data_loader):
     model.eval()
+    all_preds = []
+    all_y = []
     with torch.no_grad():
-        y_pred_proba = model(X.float()).cpu().numpy()
-        auroc = roc_auc_score(y, y_pred_proba)
-        auprc = average_precision_score(y, y_pred_proba)
+        for X, y in data_loader:
+            X = X.to("cuda")
+            y_pred_proba = model(X.float()).cpu().numpy()
+            all_preds.append(y_pred_proba)
+            all_y.append(y)
+    all_preds = np.concatenate(all_preds, axis=0)
+    all_y = np.concatenate(all_y, axis=0)
+    auroc = roc_auc_score(all_y, all_preds)
+    auprc = average_precision_score(all_y, all_preds)
     return auroc, auprc
 
 
-def voting(models_info, selected_model):
+def voting(data_dir, models_info, selected_model, batch_size):
     train_ROC = []
     train_PRC = []
     val_ROC = []
@@ -53,10 +63,9 @@ def voting(models_info, selected_model):
     models = []
     for idx, model_info in models_info.items():
         if idx in selected_model:
-            model = torch.load(model_info['model_path']).to('cpu')
+            model = torch.load(model_info['model_path']).to('cuda')
             models.append(model)
 
-    data_dir = f'E:\deeplearning\Zhongda\data_tensor_zhongda.pth'
     data = torch.load(data_dir)
     data_train = data['data_tensor_train']
     label_train = data['label_tensor_train']
@@ -66,24 +75,33 @@ def voting(models_info, selected_model):
     label_test = data['label_tensor_test']
     i = 1
 
+    dataset_train = TensorDataset(data_train, label_train)
+    dataset_val = TensorDataset(data_val, label_val)
+    dataset_test = TensorDataset(data_test, label_test)
+
+    # 利用 DataLoader 来加载数据集
+    train_dataloader_f = DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
+    val_dataloader_f = DataLoader(dataset_val, batch_size=batch_size, shuffle=True)
+    test_dataloader_f = DataLoader(dataset_test, batch_size=batch_size, shuffle=True)
+
     voting_type = 'soft'
     print("Voting Type:", voting_type)
     voting_model = VotingEnsemble(models, voting_type=voting_type)
     print("Voting Model Results:")
 
-    auroc, auprc = evaluate_model_auc(voting_model, data_train, label_train)
+    auroc, auprc = evaluate_model_auc(voting_model, train_dataloader_f)
     train_ROC.append(auroc)
     train_PRC.append(auprc)
     print("\tAUROC train:", auroc)
     print("\tAUPRC train:", auprc)
 
-    auroc, auprc = evaluate_model_auc(voting_model, data_val, label_val)
+    auroc, auprc = evaluate_model_auc(voting_model, val_dataloader_f)
     val_ROC.append(auroc)
     val_PRC.append(auprc)
     print("\tAUROC val:", auroc)
     print("\tAUPRC val:", auprc)
 
-    auroc, auprc = evaluate_model_auc(voting_model, data_test, label_test)
+    auroc, auprc = evaluate_model_auc(voting_model, test_dataloader_f)
     test_ROC.append(auroc)
     test_PRC.append(auprc)
     print("\tAUROC test:", auroc)
@@ -94,19 +112,19 @@ def voting(models_info, selected_model):
     voting_model = VotingEnsemble(models, voting_type=voting_type)
     print("Voting Model Results:")
 
-    auroc, auprc = evaluate_model_auc(voting_model, data_train, label_train)
+    auroc, auprc = evaluate_model_auc(voting_model, train_dataloader_f)
     train_ROC.append(auroc)
     train_PRC.append(auprc)
     print("\tAUROC train:", auroc)
     print("\tAUPRC train:", auprc)
 
-    auroc, auprc = evaluate_model_auc(voting_model, data_val, label_val)
+    auroc, auprc = evaluate_model_auc(voting_model,val_dataloader_f)
     val_ROC.append(auroc)
     val_PRC.append(auprc)
     print("\tAUROC val:", auroc)
     print("\tAUPRC val:", auprc)
 
-    auroc, auprc = evaluate_model_auc(voting_model, data_test, label_test)
+    auroc, auprc = evaluate_model_auc(voting_model, test_dataloader_f)
     test_ROC.append(auroc)
     test_PRC.append(auprc)
     print("\tAUROC test:", auroc)
@@ -116,19 +134,19 @@ def voting(models_info, selected_model):
 
     for name in selected_model:
         print(f'{i}.', models_info[name]['model_name'])
-        auroc, auprc = evaluate_model_auc(models[i - 1], data_train, label_train)
+        auroc, auprc = evaluate_model_auc(models[i - 1], train_dataloader_f)
         train_ROC.append(auroc)
         train_PRC.append(auprc)
         print("\tAUROC train:", auroc)
         print("\tAUPRC train:", auprc)
 
-        auroc, auprc = evaluate_model_auc(models[i - 1], data_val, label_val)
+        auroc, auprc = evaluate_model_auc(models[i - 1],val_dataloader_f)
         val_ROC.append(auroc)
         val_PRC.append(auprc)
         print("\tAUROC val:", auroc)
         print("\tAUPRC val:", auprc)
 
-        auroc, auprc = evaluate_model_auc(models[i - 1], data_test, label_test)
+        auroc, auprc = evaluate_model_auc(models[i - 1], test_dataloader_f)
         test_ROC.append(auroc)
         test_PRC.append(auprc)
         print("\tAUROC test:", auroc)
@@ -175,39 +193,52 @@ def plot_auc(auc, selected_model):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f'zzz_saved_model/auc_{name_list}.png', bbox_inches='tight')
+    plt.savefig(f'ZYY/zzz_saved_model/auc_{name_list}.png', bbox_inches='tight')
     plt.show()
 
 
 if __name__=='__main__':
-    models_info = {
+    data_dir = f'E:\deeplearning\Zhongda\zyy_tensor.pth'
+
+    # models_info = {
+    #     "model1": {
+    #         "model_name": "BiLSTM_BN, smote",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_smote_FocalLoss_100_model_2.pth"
+    #     },
+    #     "model2": {
+    #         "model_name": "BiLSTM_BN, undersample",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_undersample_FocalLoss_500_model_123.pth"
+    #     },
+    #     "model3": {
+    #         "model_name": "BiLSTM_BN, undersample",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_undersample_FocalLoss_1000_model_48.pth"
+    #     },
+    #     "model4": {
+    #         "model_name": "BiLSTM_BN, undersample",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_undersample_FocalLoss_1000_model_97.pth"
+    #     },
+    #     "model5": {
+    #         "model_name": "BiLSTM_BN_ResBlock, oversample",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_ResBlock_model_oversample_FocalLoss_50_model_6.pth"
+    #     },
+    #     "model6": {
+    #         "model_name": "BiLSTM_BN_ResBlock, smote",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_Resnet_model_smote_FocalLoss_100_model_1.pth"
+    #     },
+    #     "model7": {
+    #         "model_name": "BiLSTM_BN_ResBlock, smote",
+    #         "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_Resnet_model_smote_FocalLoss_100_model_3.pth"
+    #     }
+    # }
+
+    models_info_zyy = {
         "model1": {
-            "model_name": "BiLSTM_BN, smote",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_smote_FocalLoss_100_model_2.pth"
+            "model_name": "BiLSTM_BN, undersample, 21",
+            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_model_undersample_FocalLoss_100_0.01_model_21.pth"
         },
         "model2": {
-            "model_name": "BiLSTM_BN, undersample",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_undersample_FocalLoss_500_model_123.pth"
-        },
-        "model3": {
-            "model_name": "BiLSTM_BN, undersample",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_undersample_FocalLoss_1000_model_48.pth"
-        },
-        "model4": {
-            "model_name": "BiLSTM_BN, undersample",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_model_undersample_FocalLoss_1000_model_97.pth"
-        },
-        "model5": {
-            "model_name": "BiLSTM_BN_ResBlock, oversample",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_ResBlock_model_oversample_FocalLoss_50_model_6.pth"
-        },
-        "model6": {
-            "model_name": "BiLSTM_BN_ResBlock, smote",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_Resnet_model_smote_FocalLoss_100_model_1.pth"
-        },
-        "model7": {
-            "model_name": "BiLSTM_BN_ResBlock, smote",
-            "model_path": "zzz_saved_model/Zhongda_BiLSTM_BN_Resnet_model_smote_FocalLoss_100_model_3.pth"
+            "model_name": "BiLSTM_BN, undersample, 57",
+            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_model_undersample_FocalLoss_100_0.01_model_21.pth"
         }
     }
 
@@ -216,5 +247,5 @@ if __name__=='__main__':
     # plot_auc(auc, selected_model)
 
     selected_model = [] # 默认全选
-    auc = voting(models_info, selected_model)
-    plot_auc(auc, selected_model)
+    auc = voting(data_dir, models_info_zyy, selected_model, 512)
+    # plot_auc(auc, selected_model)

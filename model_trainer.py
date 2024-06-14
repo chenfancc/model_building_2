@@ -104,10 +104,10 @@ class TrainModel:
                     if not os.path.exists(f'{self.root_dir}/zzz_saved_model'):
                         os.makedirs(f'{self.root_dir}/zzz_saved_model')
                 torch.save(self.model, model_saved_dir)
-                print(f'Model has been saved into: model_saved_dir')
-                self.saved_num += 1
-                if self.saved_num == len(self.save_model_index):
-                    break
+                print(f'Model has been saved into: {model_saved_dir}')
+                # self.saved_num += 1
+                # if self.saved_num == len(self.save_model_index):
+                #     break
 
             if self.valid:
                 (loss, accuracy_auc, specificity_auc, alarm_sen_auc, alarm_acc_auc,
@@ -232,7 +232,7 @@ class TrainModel:
                 total_valid_loss += loss.item()
 
             valid_loss = total_valid_loss / count
-            print("整体测试集上的Loss: {}".format(valid_loss))
+            print("整体验证集上的Loss: {}".format(valid_loss))
             true_labels_flat = np.concatenate(true_labels)
             predicted_probs_flat = np.concatenate(predicted_probs)
 

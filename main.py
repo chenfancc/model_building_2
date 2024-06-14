@@ -6,7 +6,7 @@ from function import plot_info
 
 BATCH_SIZE = 512
 EPOCH = 100
-LR = 5e-06
+LR = 0.01 # 5e-6
 GAMMA = 0.95
 STEP_SIZE = 20  # 每隔多少个 epoch 衰减一次学习率
 DECAY = 1e-4
@@ -87,9 +87,9 @@ if __name__ == '__main__':
                       BiLSTM_BN_ResBlock, GRU_BN_ResBlock, RNN_BN_ResBlock,
                       BiLSTM_BN_ResBlock_3layers, GRU_BN_ResBlock_3layers, RNN_BN_ResBlock_3layers,
                       BiLSTM_BN_single, GRU_BN_single, RNN_BN_single]:
-            tensor_direction = f'E:\deeplearning\Zhongda\data_tensor_zhongda.pth'
+            tensor_direction = f'E:\deeplearning\Zhongda\zyy_tensor.pth'
             train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD, BATCH_SIZE)
-            model_name = f"ZYY_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}"
+            model_name = f"ZYY_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}_{LR}"
             loss_f = FocalLoss(ALPHA_LOSS, GAMMA_LOSS)
             trainer = TrainModel(model_name, model, hyperparameters, train_dataloader, val_dataloader,
                                  criterion_class=loss_f, root_dir='ZYY')
