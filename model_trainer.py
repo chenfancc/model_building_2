@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from torch import nn
 from torch.optim.lr_scheduler import StepLR
 
+
 class TrainModel:
     """
     训练网络的类
