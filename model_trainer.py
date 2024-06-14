@@ -135,6 +135,7 @@ class TrainModel:
                     "LEARNING_RATE": self.LR,
                     "GAMMA": self.GAMMA,
                     "STEP_SIZE": self.STEP_SIZE,
+                    "DECAY": self.DECAY,
                     "device": self.DEVICE,
                     "SEED": self.SEED,
                     "ALPHA_LOSS": self.ALPHA_LOSS,

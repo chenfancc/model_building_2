@@ -21,6 +21,7 @@ hyperparameters = {
     "LEARNING_RATE": LR,
     "GAMMA": GAMMA,
     "STEP_SIZE": STEP_SIZE,
+    "DECAY": DECAY,
     "device": DEVICE,
     "SEED": SEED,
     "ALPHA_LOSS": ALPHA_LOSS,
@@ -84,10 +85,10 @@ if __name__ == '__main__':
         for model in [BiLSTM_BN_single, GRU_BN_single, RNN_BN_single]:
             tensor_direction = f'E:\deeplearning\Zhongda\data_tensor_zhongda.pth'
             train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD, BATCH_SIZE)
-            # model_name = f"Zhongda_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}"
-            model_name = "AAAsavemodel"
-            trainer = TrainModel(model_name, model, train_dataloader, val_dataloader,
-                                 criterion_class=FocalLoss(ALPHA_LOSS, GAMMA_LOSS))
+            model_name = f"Zhongda_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}"
+            loss_f = FocalLoss(ALPHA_LOSS, GAMMA_LOSS)
+            trainer = TrainModel(model_name, model, hyperparameters, train_dataloader, val_dataloader,
+                                 criterion_class=loss_f)
             info = trainer.train()
             trainer.save_model()
             plot_info(info, model_name)
