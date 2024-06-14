@@ -6,6 +6,7 @@ from sampled import BalancedData
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, title='CM', cmap=plt.cm.Blues):
     """
     This function prints and plots the confusion matrix.
@@ -25,7 +26,7 @@ def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, t
 
     plt.figure(figsize=(8, 6))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(f"{name}_{title}_{idx+1}")
+    plt.title(f"{name}_{title}_{idx + 1}")
     plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)
@@ -42,7 +43,7 @@ def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, t
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    plt.savefig(f"{model_name}/{model_name}_{name}_CM_EPOCH_{idx+1}.png")
+    plt.savefig(f"{model_name}/{model_name}_{name}_CM_EPOCH_{idx + 1}.png")
     plt.close()
 
 
@@ -185,6 +186,7 @@ def plot_info(info, model_name):
     plt.grid()
     plt.savefig(f'{model_name}/07_brier_score.png')
     plt.close()
+
 
 class FocalLoss(nn.Module):
     def __init__(self, alpha=1, gamma=3, reduction='mean'):
