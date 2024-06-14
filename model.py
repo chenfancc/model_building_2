@@ -1,7 +1,6 @@
 import torch
 from torch import nn
-
-from hyperparameters import Feature_number
+Feature_number = 5
 
 
 class BiLSTM(nn.Module):

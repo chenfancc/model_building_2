@@ -2,7 +2,6 @@ import numpy as np
 import torch
 from matplotlib import pyplot as plt
 from torch.utils.data import TensorDataset, DataLoader
-from hyperparameters import *
 from sampled import BalancedData
 import torch.nn as nn
 import torch.nn.functional as F
@@ -65,7 +64,7 @@ def calculate_metrics(true_labels_flat, predicted_probs_flat, best_threshold):
     return confusion_matrix, specificity, sensitivity, alarm_accuracy, accuracy
 
 
-def main_data_loader(data_dir, sample_method):
+def main_data_loader(data_dir, sample_method, batch_size):
     """
     加载数据
     :param data_dir: 数据位置。如：data_label_1/data_tensor_24.pth
@@ -89,9 +88,9 @@ def main_data_loader(data_dir, sample_method):
     dataset_test = TensorDataset(data_test, label_test)
 
     # 利用 DataLoader 来加载数据集
-    train_dataloader_f = DataLoader(dataset_train, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader_f = DataLoader(dataset_val, batch_size=BATCH_SIZE, shuffle=True)
-    test_dataloader_f = DataLoader(dataset_test, batch_size=BATCH_SIZE, shuffle=True)
+    train_dataloader_f = DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
+    val_dataloader_f = DataLoader(dataset_val, batch_size=batch_size, shuffle=True)
+    test_dataloader_f = DataLoader(dataset_test, batch_size=batch_size, shuffle=True)
     return train_dataloader_f, val_dataloader_f, test_dataloader_f
 
 

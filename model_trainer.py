@@ -8,28 +8,58 @@ from sklearn.metrics import *
 import matplotlib.pyplot as plt
 from torch import nn
 from torch.optim.lr_scheduler import StepLR
-from hyperparameters import *
-
 
 class TrainModel:
-    def __init__(self, my_model_name, model, train_loader, valid_loader=None, test_loader=None,
+    """
+    训练网络的类
+    """
+
+    def __init__(self, my_model_name, model, hyperparameters, train_loader, valid_loader=None, test_loader=None,
                  optimizer_class=torch.optim.Adam, criterion_class=nn.BCELoss, scheduler_class=StepLR,
-                 best_model=True, valid=True, save_model_index=None):
+                 valid=True, save_model_index=None):
+        """
+        初始化训练
+        :param my_model_name: 模型名称
+        :param model: 定义好的模型结构，在model.py文件中，直接传入模型的类名，如BiLSTM_BN
+        :param hyperparameters: 传入超参数，类型为字典
+        :param train_loader: 训练集
+        :param valid_loader: 验证集
+        :param test_loader: 测试集
+        :param optimizer_class: 优化器
+        :param criterion_class: 损失函数
+        :param scheduler_class: 学习率的策略
+        :param valid: 如果为False，将跳过输出
+        :param save_model_index: 训练效果较好的模型的Epoch（从1开始）
+        """
+        self.BATCH_SIZE = hyperparameters.get("BATCH_SIZE")
+        self.EPOCH = hyperparameters.get("EPOCH")
+        self.LR = hyperparameters.get("LEARNING_RATE")
+        self.GAMMA = hyperparameters.get("GAMMA")
+        self.STEP_SIZE = hyperparameters.get("STEP_SIZE")
+        self.DECAY = hyperparameters.get("DECAY", 1e-6)
+        self.DEVICE = hyperparameters.get("device")
+        self.SEED = hyperparameters.get("SEED")
+        self.ALPHA_LOSS = hyperparameters.get("ALPHA_LOSS")
+        self.GAMMA_LOSS = hyperparameters.get("GAMMA_LOSS")
+
         self.model_name = my_model_name
         self.model = model()
         self.train_dataloader = train_loader
         self.valid_dataloader = valid_loader
         self.test_dataloader = test_loader
-        self.optimizer = optimizer_class(self.model.parameters(), lr=LR, weight_decay=DECAY)
+        self.optimizer = optimizer_class(self.model.parameters(), lr=self.LR, weight_decay=self.DECAY)
         self.criterion = criterion_class
-        self.scheduler = scheduler_class(self.optimizer, step_size=STEP_SIZE, gamma=GAMMA)
-        self.best_model = best_model
+        self.scheduler = scheduler_class(self.optimizer, step_size=self.STEP_SIZE, gamma=self.GAMMA)
         self.valid = valid
         self.save_model_index = save_model_index
-        self.model.to(DEVICE)
-        self.saved_num=0
+        self.model.to(self.DEVICE)
+        self.saved_num = 0
 
     def train(self):
+        """
+        训练主函数
+        :return: info.json
+        """
         train_total_loss = []
         train_loss_list = []
         val_loss_list = []
@@ -46,9 +76,9 @@ class TrainModel:
         brier_list = []
         info = {}
 
-        for epoch in range(EPOCH):
+        for epoch in range(self.EPOCH):
             print(f"---------------------------------------"
-                  f"Epoch: {epoch+1}"
+                  f"Epoch: {epoch + 1}"
                   f"---------------------------------------")
             train_loss = self.train_one_epoch()
             train_total_loss.extend(train_loss)
@@ -59,10 +89,10 @@ class TrainModel:
             if not os.path.exists(model_directory):
                 os.makedirs(model_directory)
             if self.save_model_index and (epoch + 1) in self.save_model_index:
-                torch.save(self.model.state_dict(), f'zzz_saved_model/{self.model_name}_model_{epoch+1}.pth')
-                print(f'zzz_saved_model/{self.model_name}_model_{epoch}')
+                torch.save(self.model.state_dict(), f'zzz_saved_model/{self.model_name}_model_{epoch + 1}.pth')
+                print(f'Model has been saved iinto: zzz_saved_model/{self.model_name}_model_{epoch}')
                 self.saved_num += 1
-                if self.saved_num == len(self.save_model_index) and self.valid:
+                if self.saved_num == len(self.save_model_index):
                     break
 
             if self.valid:
@@ -99,32 +129,44 @@ class TrainModel:
                 }
                 # Save hyperparameters
                 hyperparameters = {
-                    "BATCH_SIZE": BATCH_SIZE,
-                    "EPOCH": EPOCH,
-                    "LEARNING_RATE": LR,
-                    "GAMMA": GAMMA,
-                    "STEP_SIZE": STEP_SIZE,
-                    "device": DEVICE,
-                    "SEED": SEED,
-                    "ALPHA_LOSS": ALPHA_LOSS,
-                    "GAMMA_LOSS": GAMMA_LOSS
+                    "BATCH_SIZE": self.BATCH_SIZE,
+                    "EPOCH": self.EPOCH,
+                    "LEARNING_RATE": self.LR,
+                    "GAMMA": self.GAMMA,
+                    "STEP_SIZE": self.STEP_SIZE,
+                    "device": self.DEVICE,
+                    "SEED": self.SEED,
+                    "ALPHA_LOSS": self.ALPHA_LOSS,
+                    "GAMMA_LOSS": self.GAMMA_LOSS
                 }
-                with open(f'./{self.model_name}/hyperparameters.json', 'w') as json_file:
+                with open(f'./{self.model_name}/00_hyperparameters.json', 'w') as json_file:
                     json.dump(hyperparameters, json_file, indent=4)
-                with open(f'./{self.model_name}/info.json', 'w') as json_file:
+                with open(f'./{self.model_name}/00_info.json', 'w') as json_file:
                     json.dump(info, json_file, indent=4)
 
             self.scheduler.step()
 
         return info
 
+    def save_model(self):
+        """
+        保存终末状态模型
+        :return: None
+        """
+        torch.save(self.model, f"{self.model_name}/00_{self.model_name}_final_model.pth")
+        return None
+
     def train_one_epoch(self):
+        """
+        每个EPOCH的训练函数
+        :return: 每个Epoch的损失列表
+        """
         one_epoch_loss = []
         epoch_train_step = 0
 
         self.model.train()
         for inputs, labels in self.train_dataloader:
-            inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
+            inputs, labels = inputs.to(self.DEVICE), labels.to(self.DEVICE)
 
             self.optimizer.zero_grad()
             outputs = self.model(inputs.float())
@@ -135,7 +177,7 @@ class TrainModel:
 
             epoch_train_step += 1
             if epoch_train_step % 100 == 0:
-                print(f'Train iter:{epoch_train_step}, Loss: {loss.item()}, Device: {DEVICE}')
+                print(f'Train iter:{epoch_train_step}, Loss: {loss.item()}, Device: {self.DEVICE}')
 
             one_epoch_loss.append(loss.item())
 
@@ -144,11 +186,11 @@ class TrainModel:
     def validate(self, epoch):
         """
         计算每一个epoch结束的模型性能
-        :param epoch:
+        :param epoch: 当前Epoch
         :return: valid_loss, valid_accuracy, valid_specificity, valid_alarm_sen, valid_alarm_acc, valid_auc
         """
         self.model.eval()
-        self.model.to(DEVICE)
+        self.model.to(self.DEVICE)
         eps = 1e-6
         total_valid_loss = eps
         true_labels = []
@@ -158,7 +200,7 @@ class TrainModel:
         with torch.no_grad():
             for inputs, targets in self.valid_dataloader:
                 count += 1
-                inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
+                inputs, targets = inputs.to(self.DEVICE), targets.to(self.DEVICE)
                 outputs = self.model(inputs.float())
                 true_labels.append(targets.cpu().numpy())
                 predicted_probs.append(outputs.cpu().numpy())
@@ -199,9 +241,9 @@ class TrainModel:
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title(f'Receiver Operating Characteristic (ROC) - Epoch {epoch+1}')
+        plt.title(f'Receiver Operating Characteristic (ROC) - Epoch {epoch + 1}')
         plt.legend(loc="lower right")
-        plt.savefig(f"{self.model_name}/{self.model_name}_ROC_EPOCH_{epoch+1}.png")
+        plt.savefig(f"{self.model_name}/{self.model_name}_ROC_EPOCH_{epoch + 1}.png")
         plt.close()
 
         return valid_auc, best_threshold
@@ -220,9 +262,9 @@ class TrainModel:
         plt.ylim([0.0, 1.05])
         plt.xlabel('Recall')
         plt.ylabel('Precision')
-        plt.title(f'Precision-Recall Curve - Epoch {epoch+1}')
+        plt.title(f'Precision-Recall Curve - Epoch {epoch + 1}')
         plt.legend(loc='lower left')
-        plt.savefig(f"{self.model_name}/{self.model_name}_PRC_EPOCH_{epoch+1}.png")
+        plt.savefig(f"{self.model_name}/{self.model_name}_PRC_EPOCH_{epoch + 1}.png")
         plt.grid()
         plt.close()
 

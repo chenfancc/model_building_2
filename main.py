@@ -4,6 +4,29 @@ import numpy as np
 from model import *
 from function import plot_info
 
+BATCH_SIZE = 512
+EPOCH = 10
+LR = 1e-06
+GAMMA = 0.95
+STEP_SIZE = 20  # 每隔多少个 epoch 衰减一次学习率
+DECAY = 1e-4
+DEVICE = "cuda"
+SEED = 42
+ALPHA_LOSS = 1
+GAMMA_LOSS = 3
+
+hyperparameters = {
+    "BATCH_SIZE": BATCH_SIZE,
+    "EPOCH": EPOCH,
+    "LEARNING_RATE": LR,
+    "GAMMA": GAMMA,
+    "STEP_SIZE": STEP_SIZE,
+    "device": DEVICE,
+    "SEED": SEED,
+    "ALPHA_LOSS": ALPHA_LOSS,
+    "GAMMA_LOSS": GAMMA_LOSS
+}
+
 # 设置随机种子
 np.random.seed(SEED)
 torch.manual_seed(SEED)
@@ -60,12 +83,16 @@ if __name__ == '__main__':
     for SAMPLE_METHOD in ["undersample", "origin", "smote", "oversample"]:
         for model in [BiLSTM_BN_single, GRU_BN_single, RNN_BN_single]:
             tensor_direction = f'E:\deeplearning\Zhongda\data_tensor_zhongda.pth'
-            train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD)
-            model_name = f"Zhongda_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}"
+            train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD, BATCH_SIZE)
+            # model_name = f"Zhongda_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}"
+            model_name = "AAAsavemodel"
             trainer = TrainModel(model_name, model, train_dataloader, val_dataloader,
                                  criterion_class=FocalLoss(ALPHA_LOSS, GAMMA_LOSS))
             info = trainer.train()
+            trainer.save_model()
             plot_info(info, model_name)
+            break
+        break
 
 
 # if __name__ == '__main__':
