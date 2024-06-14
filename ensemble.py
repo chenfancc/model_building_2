@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
-from sklearn.metrics import roc_auc_score, average_precision_score
+from sklearn.metrics import roc_auc_score, average_precision_score, roc_curve, auc, precision_recall_curve
 from torch.utils.data import TensorDataset, DataLoader
 
 
@@ -44,8 +44,10 @@ def evaluate_model_auc(model, data_loader):
             all_y.append(y)
     all_preds = np.concatenate(all_preds, axis=0)
     all_y = np.concatenate(all_y, axis=0)
-    auroc = roc_auc_score(all_y, all_preds)
-    auprc = average_precision_score(all_y, all_preds)
+    fpr, tpr, _ = roc_curve(all_y, all_preds)
+    auroc = auc(fpr, tpr)
+    precision, recall, _ = precision_recall_curve(all_y, all_preds)
+    auprc = auc(recall, precision)
     return auroc, auprc
 
 
@@ -153,7 +155,7 @@ def voting(data_dir, models_info, selected_model, batch_size):
         print("\tAUPRC test:", auprc)
         i += 1
 
-    auc = {
+    auc_dict = {
         'train_roc': train_ROC,
         'train_prc': train_PRC,
         'val_roc': val_ROC,
@@ -162,7 +164,7 @@ def voting(data_dir, models_info, selected_model, batch_size):
         'test_prc': test_PRC
     }
 
-    return auc
+    return auc_dict
 
 
 def T(matrix):
@@ -233,12 +235,16 @@ if __name__=='__main__':
 
     models_info_zyy = {
         "model1": {
-            "model_name": "BiLSTM_BN, undersample, 21",
-            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_model_undersample_FocalLoss_100_0.01_model_21.pth"
+            "model_name": "BiLSTM_BN, undersample, 52",
+            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_model_undersample_FocalLoss_100_0.01_model_52.pth"
         },
         "model2": {
             "model_name": "BiLSTM_BN, undersample, 57",
-            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_model_undersample_FocalLoss_100_0.01_model_21.pth"
+            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_model_undersample_FocalLoss_100_0.01_model_57.pth"
+        },
+        "model3": {
+            "model_name": "BiLSTM_BN_larger, undersample, 21",
+            "model_path": "ZYY/zzz_saved_model/ZYY_BiLSTM_BN_larger_model_undersample_FocalLoss_100_0.01_model_21.pth"
         }
     }
 
@@ -247,5 +253,5 @@ if __name__=='__main__':
     # plot_auc(auc, selected_model)
 
     selected_model = [] # 默认全选
-    auc = voting(data_dir, models_info_zyy, selected_model, 512)
+    auc_dict = voting(data_dir, models_info_zyy, selected_model, 512)
     # plot_auc(auc, selected_model)
