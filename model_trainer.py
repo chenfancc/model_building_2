@@ -89,8 +89,8 @@ class TrainModel:
             if not os.path.exists(model_directory):
                 os.makedirs(model_directory)
             if self.save_model_index and (epoch + 1) in self.save_model_index:
-                torch.save(self.model.state_dict(), f'zzz_saved_model/{self.model_name}_model_{epoch + 1}.pth')
-                print(f'Model has been saved iinto: zzz_saved_model/{self.model_name}_model_{epoch}')
+                torch.save(self.model, f'zzz_saved_model/{self.model_name}_model_{epoch + 1}.pth')
+                print(f'Model has been saved into: zzz_saved_model/{self.model_name}_model_{epoch}')
                 self.saved_num += 1
                 if self.saved_num == len(self.save_model_index):
                     break
