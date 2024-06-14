@@ -9,12 +9,12 @@ from model import RNN_BN_ResBlock, RNN_BN, RNN_BN_4layers, GRU_BN, GRU_BN_4layer
 from model_trainer import TrainModel
 
 dict_epoch = {
-    'Zhongda_RNN_BN_ResBlock_model_oversample_FocalLoss_40': [1],
-    'Zhongda_RNN_BN_model_oversample_FocalLoss_50': [4, 3],
-    'Zhongda_RNN_BN_4layers_model_undersample_FocalLoss_50': [18],
-    'Zhongda_GRU_BN_model_undersample_FocalLoss_50': [35],
-    'Zhongda_GRU_BN_model_origin_FocalLoss_60': [38],
-    'Zhongda_GRU_BN_4layers_model_oversample_FocalLoss_40': [1],
+    # 'Zhongda_RNN_BN_ResBlock_model_oversample_FocalLoss_40': [1],
+    # 'Zhongda_RNN_BN_model_oversample_FocalLoss_50': [4, 3],
+    # 'Zhongda_RNN_BN_4layers_model_undersample_FocalLoss_50': [18],
+    # 'Zhongda_GRU_BN_model_undersample_FocalLoss_50': [35],
+    # 'Zhongda_GRU_BN_model_origin_FocalLoss_60': [38],
+    # 'Zhongda_GRU_BN_4layers_model_oversample_FocalLoss_40': [1],
     'Zhongda_BiLSTM_BN_Resnet_model_smote_FocalLoss': [1, 3],
     'Zhongda_BiLSTM_BN_ResBlock_model_oversample_FocalLoss_50': [6],
     'Zhongda_BiLSTM_BN_model_smote_FocalLoss': [2],

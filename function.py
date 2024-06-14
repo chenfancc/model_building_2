@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, title='CM', cmap=plt.cm.Blues):
+def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, title='CM', cmap=plt.cm.Blues, root_dir=None):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -43,7 +43,11 @@ def plot_confusion_matrix(model_name, name, idx, cm, classes, normalize=False, t
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    plt.savefig(f"{model_name}/{model_name}_{name}_CM_EPOCH_{idx + 1}.png")
+    if root_dir is None:
+        plt.savefig(f"{model_name}/{model_name}_{name}_CM_EPOCH_{idx + 1}.png")
+    else:
+        plt.savefig(f"{root_dir}/{model_name}/{model_name}_{name}_CM_EPOCH_{idx + 1}.png")
+
     plt.close()
 
 
@@ -95,7 +99,7 @@ def main_data_loader(data_dir, sample_method, batch_size):
     return train_dataloader_f, val_dataloader_f, test_dataloader_f
 
 
-def plot_info(info, model_name):
+def plot_info(info, model_name, root_dir=None):
     epochs = range(1, len(info['train_loss_list']) + 1)
 
     plt.figure()
@@ -103,7 +107,10 @@ def plot_info(info, model_name):
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.title('Total Train Loss')
-    plt.savefig(f'{model_name}/01_total_loss.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/01_total_loss.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/01_total_loss.png')
     plt.close()
 
     # 绘制训练和验证损失
@@ -114,7 +121,10 @@ def plot_info(info, model_name):
     plt.ylabel('Loss')
     plt.title(f'Train and Validation Loss of {model_name}')
     plt.legend()
-    plt.savefig(f'{model_name}/02_loss_curve.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/02_loss_curve.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/02_loss_curve.png')
     plt.show()
 
     # 绘制各个指标
@@ -127,7 +137,10 @@ def plot_info(info, model_name):
     plt.ylabel('Percent')
     plt.title('Model Performance when best AUC')
     plt.legend()
-    plt.savefig(f'{model_name}/03_model_performance_auc.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/03_model_performance_auc.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/03_model_performance_auc.png')
     plt.close()
 
     # 绘制各个指标
@@ -141,7 +154,10 @@ def plot_info(info, model_name):
     plt.title('Model Performance when beat PRC')
     plt.legend()
     plt.grid()
-    plt.savefig(f'{model_name}/04_model_performance_prc.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/04_model_performance_prc.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/04_model_performance_prc.png')
     plt.close()
 
     # 绘制ROC AUC
@@ -153,7 +169,10 @@ def plot_info(info, model_name):
     plt.title(f'AUC of {model_name}')
     plt.legend()
     plt.grid()
-    plt.savefig(f'{model_name}/05_auc_curve.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/05_auc_curve.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/05_auc_curve.png')
     plt.show()
 
     plt.figure()
@@ -164,7 +183,10 @@ def plot_info(info, model_name):
     plt.title('ROC over Epochs')
     plt.legend()
     plt.grid()
-    plt.savefig(f'{model_name}/06_roc_curve.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/06_roc_curve.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/06_roc_curve.png')
     plt.close()
 
     plt.figure()
@@ -174,7 +196,10 @@ def plot_info(info, model_name):
     plt.title('PRC over Epochs')
     plt.legend()
     plt.grid()
-    plt.savefig(f'{model_name}/06_prc_curve.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/06_prc_curve.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/06_prc_curve.png')
     plt.close()
 
     plt.figure()
@@ -184,7 +209,10 @@ def plot_info(info, model_name):
     plt.title('Brier Score over Epochs')
     plt.legend()
     plt.grid()
-    plt.savefig(f'{model_name}/07_brier_score.png')
+    if root_dir is None:
+        plt.savefig(f'{model_name}/07_brier_score.png')
+    else:
+        plt.savefig(f'{root_dir}/{model_name}/07_brier_score.png')
     plt.close()
 
 

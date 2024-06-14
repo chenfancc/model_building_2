@@ -17,7 +17,7 @@ class TrainModel:
 
     def __init__(self, my_model_name, model, hyperparameters, train_loader, valid_loader=None, test_loader=None,
                  optimizer_class=torch.optim.Adam, criterion_class=nn.BCELoss, scheduler_class=StepLR,
-                 valid=True, save_model_index=None):
+                 valid=True, save_model_index=None, root_dir=None):
         """
         初始化训练
         :param my_model_name: 模型名称
@@ -32,6 +32,7 @@ class TrainModel:
         :param valid: 如果为False，将跳过输出
         :param save_model_index: 训练效果较好的模型的Epoch（从1开始）
         """
+        self.root_dir = root_dir
         self.BATCH_SIZE = hyperparameters.get("BATCH_SIZE")
         self.EPOCH = hyperparameters.get("EPOCH")
         self.LR = hyperparameters.get("LEARNING_RATE")
@@ -86,12 +87,24 @@ class TrainModel:
             train_loss_list.append(train_loss[-1])
             print(f'Epoch {epoch + 1}, Train Loss: {train_loss[-1]:.4f}')
 
-            model_directory = f"./{self.model_name}/"
+            if self.root_dir is None:
+                model_directory = f"./{self.model_name}/"
+            else:
+                model_directory = f"./{self.root_dir}/{self.model_name}/"
+
             if not os.path.exists(model_directory):
                 os.makedirs(model_directory)
             if self.save_model_index and (epoch + 1) in self.save_model_index:
-                torch.save(self.model, f'zzz_saved_model/{self.model_name}_model_{epoch + 1}.pth')
-                print(f'Model has been saved into: zzz_saved_model/{self.model_name}_model_{epoch}')
+                if self.root_dir is None:
+                    model_saved_dir = f'zzz_saved_model/{self.model_name}_model_{epoch + 1}.pth'
+                    if not os.path.exists('zzz_saved_model'):
+                        os.makedirs('zzz_saved_model')
+                else:
+                    model_saved_dir = f'{self.root_dir}/zzz_saved_model/{self.model_name}_model_{epoch + 1}.pth'
+                    if not os.path.exists(f'{self.root_dir}/zzz_saved_model'):
+                        os.makedirs(f'{self.root_dir}/zzz_saved_model')
+                torch.save(self.model, model_saved_dir)
+                print(f'Model has been saved into: model_saved_dir')
                 self.saved_num += 1
                 if self.saved_num == len(self.save_model_index):
                     break
@@ -141,11 +154,16 @@ class TrainModel:
                     "ALPHA_LOSS": self.ALPHA_LOSS,
                     "GAMMA_LOSS": self.GAMMA_LOSS
                 }
-                with open(f'./{self.model_name}/00_hyperparameters.json', 'w') as json_file:
-                    json.dump(hyperparameters, json_file, indent=4)
-                with open(f'./{self.model_name}/00_info.json', 'w') as json_file:
-                    json.dump(info, json_file, indent=4)
-
+                if self.root_dir is None:
+                    with open(f'./{self.model_name}/00_hyperparameters.json', 'w') as json_file:
+                        json.dump(hyperparameters, json_file, indent=4)
+                    with open(f'./{self.model_name}/00_info.json', 'w') as json_file:
+                        json.dump(info, json_file, indent=4)
+                else:
+                    with open(f'./{self.root_dir}/{self.model_name}/00_hyperparameters.json', 'w') as json_file:
+                        json.dump(hyperparameters, json_file, indent=4)
+                    with open(f'./{self.root_dir}/{self.model_name}/00_info.json', 'w') as json_file:
+                        json.dump(info, json_file, indent=4)
             self.scheduler.step()
 
         return info
@@ -155,7 +173,11 @@ class TrainModel:
         保存终末状态模型
         :return: None
         """
-        torch.save(self.model, f"{self.model_name}/00_{self.model_name}_final_model.pth")
+        if self.root_dir is None:
+            torch.save(self.model, f"{self.model_name}/00_{self.model_name}_final_model.pth")
+        else:
+            torch.save(self.model, f"{self.root_dir}/{self.model_name}/00_{self.model_name}_final_model.pth")
+
         return None
 
     def train_one_epoch(self):
@@ -245,7 +267,11 @@ class TrainModel:
         plt.ylabel('True Positive Rate')
         plt.title(f'Receiver Operating Characteristic (ROC) - Epoch {epoch + 1}')
         plt.legend(loc="lower right")
-        plt.savefig(f"{self.model_name}/{self.model_name}_ROC_EPOCH_{epoch + 1}.png")
+        if self.root_dir is None:
+            plt.savefig(f"{self.model_name}/{self.model_name}_ROC_EPOCH_{epoch + 1}.png")
+        else:
+            plt.savefig(f"{self.root_dir}/{self.model_name}/{self.model_name}_ROC_EPOCH_{epoch + 1}.png")
+
         plt.close()
 
         return valid_auc, best_threshold
@@ -266,7 +292,10 @@ class TrainModel:
         plt.ylabel('Precision')
         plt.title(f'Precision-Recall Curve - Epoch {epoch + 1}')
         plt.legend(loc='lower left')
-        plt.savefig(f"{self.model_name}/{self.model_name}_PRC_EPOCH_{epoch + 1}.png")
+        if self.root_dir is None:
+            plt.savefig(f"{self.model_name}/{self.model_name}_PRC_EPOCH_{epoch + 1}.png")
+        else:
+            plt.savefig(f"{self.root_dir}/{self.model_name}/{self.model_name}_PRC_EPOCH_{epoch + 1}.png")
         plt.grid()
         plt.close()
 
@@ -285,6 +314,10 @@ class TrainModel:
         print(f"Accuracy: {valid_accuracy:.4f}")
 
         # 绘制混淆矩阵
-        plot_confusion_matrix(self.model_name, name, epoch, cm, classes=['Survive', 'Death'])
+        if self.root_dir is None:
+            plot_confusion_matrix(self.model_name, name, epoch, cm, classes=['Survive', 'Death'])
+        else:
+            plot_confusion_matrix(self.model_name, name, epoch, cm, classes=['Survive', 'Death'], root_dir=self.root_dir)
+
 
         return valid_accuracy, valid_specificity, valid_alarm_sen, valid_alarm_acc
