@@ -125,7 +125,7 @@ def plot_info(info, model_name, root_dir=None):
         plt.savefig(f'{model_name}/02_loss_curve.png')
     else:
         plt.savefig(f'{root_dir}/{model_name}/02_loss_curve.png')
-    plt.show()
+    # plt.show()
 
     # 绘制各个指标
     plt.figure()
@@ -173,7 +173,7 @@ def plot_info(info, model_name, root_dir=None):
         plt.savefig(f'{model_name}/05_auc_curve.png')
     else:
         plt.savefig(f'{root_dir}/{model_name}/05_auc_curve.png')
-    plt.show()
+    # plt.show()
 
     plt.figure()
     plt.plot(epochs, info['roc_auc_list'], label='ROC AUC')

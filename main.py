@@ -5,8 +5,8 @@ from model import *
 from function import plot_info
 
 BATCH_SIZE = 512
-EPOCH = 100
-LR = 0.01 # 5e-6
+EPOCH = 1
+LR = 1e-5
 GAMMA = 0.95
 STEP_SIZE = 20  # 每隔多少个 epoch 衰减一次学习率
 DECAY = 1e-4
@@ -27,10 +27,6 @@ hyperparameters = {
     "ALPHA_LOSS": ALPHA_LOSS,
     "GAMMA_LOSS": GAMMA_LOSS
 }
-
-# 设置随机种子
-np.random.seed(SEED)
-torch.manual_seed(SEED)
 
 # if __name__ == '__main__':
 #     for SAMPLE_METHOD in ["undersample", "smote"]:
@@ -87,15 +83,29 @@ if __name__ == '__main__':
                       BiLSTM_BN_ResBlock, GRU_BN_ResBlock, RNN_BN_ResBlock,
                       BiLSTM_BN_ResBlock_3layers, GRU_BN_ResBlock_3layers, RNN_BN_ResBlock_3layers,
                       BiLSTM_BN_single, GRU_BN_single, RNN_BN_single]:
-            tensor_direction = f'E:\deeplearning\Zhongda\zyy_tensor.pth'
-            train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD, BATCH_SIZE)
-            model_name = f"ZYY_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}_{LR}"
-            loss_f = FocalLoss(ALPHA_LOSS, GAMMA_LOSS)
-            trainer = TrainModel(model_name, model, hyperparameters, train_dataloader, val_dataloader,
-                                 criterion_class=loss_f, root_dir='ZYY')
-            info = trainer.train()
-            trainer.save_model()
-            plot_info(info, model_name, root_dir='ZYY')
+            for tensor_direction in [f'E:\deeplearning\Zhongda\zyy_tensor.pth',
+                                     f'E:\deeplearning\Zhongda\zyy_fbfill_minmaxscaler_tensor.pth',
+                                     f'E:\deeplearning\Zhongda\zyy_miceimpute_stdscaler_tensor.pth']:
+                if tensor_direction == f'E:\deeplearning\Zhongda\zyy_tensor.pth':
+                    root_dir = 'ZYY'
+                elif tensor_direction == f'E:\deeplearning\Zhongda\zyy_fbfill_minmaxscaler_tensor.pth':
+                    root_dir = 'ZYY_fb_mm'
+                elif tensor_direction == f'E:\deeplearning\Zhongda\zyy_miceimpute_stdscaler_tensor.pth':
+                    root_dir = 'ZYY_mice_std'
+
+                # 设置随机种子
+                np.random.seed(SEED)
+                torch.manual_seed(SEED)
+                tensor_direction = f'E:\deeplearning\Zhongda\zyy_fbfill_minmaxscaler_tensor.pth'
+                train_dataloader, val_dataloader, test_dataloader = main_data_loader(tensor_direction, SAMPLE_METHOD,
+                                                                                     BATCH_SIZE)
+                model_name = f"ZYY_{model.__name__}_model_{SAMPLE_METHOD}_FocalLoss_{EPOCH}_{LR}"
+                loss_f = FocalLoss(ALPHA_LOSS, GAMMA_LOSS)
+                trainer = TrainModel(model_name, model, hyperparameters, train_dataloader, val_dataloader,
+                                     criterion_class=loss_f, root_dir=root_dir)
+                info = trainer.train()
+                trainer.save_model()
+                plot_info(info, model_name, root_dir=root_dir)
 
 # if __name__ == '__main__':
 #     for SAMPLE_METHOD in ["undersample"]:
