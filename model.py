@@ -1,10 +1,8 @@
 import torch
 from torch import nn
-Feature_number = 5
-
 
 class BiLSTM(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True,
                             bidirectional=True)
@@ -15,6 +13,9 @@ class BiLSTM(nn.Module):
         self.fc4 = nn.Linear(32, 8)
         self.fc5 = nn.Linear(8, 1)
         self.sig = nn.Sigmoid()
+
+    def __str__(self):
+        return 'BiLSTM'
 
     def forward(self, x):
         # print(x.shape)
@@ -41,7 +42,7 @@ class BiLSTM(nn.Module):
 
 
 class BiLSTM_BN(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True,
                             bidirectional=True)
@@ -64,6 +65,9 @@ class BiLSTM_BN(nn.Module):
         self.bn4 = nn.BatchNorm1d(8)  # 批标准化层
 
         self.fc5 = nn.Linear(8, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN'
 
     def forward(self, x):
         # print(x.shape)
@@ -96,7 +100,7 @@ class BiLSTM_BN(nn.Module):
 
 
 class BiLSTM_BN_larger(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_larger, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=256, num_layers=2, batch_first=True,
                             bidirectional=True)
@@ -119,6 +123,9 @@ class BiLSTM_BN_larger(nn.Module):
         self.bn4 = nn.BatchNorm1d(8)  # 批标准化层
 
         self.fc5 = nn.Linear(8, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_larger'
 
     def forward(self, x):
         # print(x.shape)
@@ -151,7 +158,7 @@ class BiLSTM_BN_larger(nn.Module):
 
 
 class BiLSTM_BN_Resnet(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_Resnet, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True,
                             bidirectional=True)
@@ -182,6 +189,9 @@ class BiLSTM_BN_Resnet(nn.Module):
         self.relu4 = nn.ReLU()
 
         self.fc5 = nn.Linear(8, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_Resnet'
 
     def forward(self, x):
         h0 = torch.zeros(4, x.size(0), 128).to(x.device)
@@ -224,7 +234,7 @@ class BiLSTM_BN_Resnet(nn.Module):
 
 
 class BiLSTM_BN_3layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_3layers, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=512, num_layers=3, batch_first=True,
                             bidirectional=True)
@@ -247,6 +257,9 @@ class BiLSTM_BN_3layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_3layers'
 
     def forward(self, x):
         # print(x.shape)
@@ -279,7 +292,7 @@ class BiLSTM_BN_3layers(nn.Module):
 
 
 class BiLSTM_BN_4layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_4layers, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=512, num_layers=4, batch_first=True,
                             bidirectional=True)
@@ -302,6 +315,9 @@ class BiLSTM_BN_4layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_4layers'
 
     def forward(self, x):
         # print(x.shape)
@@ -334,7 +350,7 @@ class BiLSTM_BN_4layers(nn.Module):
 
 
 class GRU_BN(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(GRU_BN, self).__init__()
         self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=2, batch_first=True)
         self.bn = nn.BatchNorm1d(1024)
@@ -356,6 +372,9 @@ class GRU_BN(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'GRU_BN'
 
     def forward(self, x):
         h0 = torch.zeros(2, x.size(0), 1024).to(x.device)
@@ -387,7 +406,7 @@ class GRU_BN(nn.Module):
 
 
 class GRU_BN_3layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(GRU_BN_3layers, self).__init__()
         self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)
         self.bn = nn.BatchNorm1d(1024)
@@ -409,6 +428,9 @@ class GRU_BN_3layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'GRU_BN_3layers'
 
     def forward(self, x):
         h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
@@ -440,7 +462,7 @@ class GRU_BN_3layers(nn.Module):
 
 
 class GRU_BN_4layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(GRU_BN_4layers, self).__init__()
         self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=4, batch_first=True)
         self.bn = nn.BatchNorm1d(1024)
@@ -462,6 +484,9 @@ class GRU_BN_4layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'GRU_BN_4layers'
 
     def forward(self, x):
         h0 = torch.zeros(4, x.size(0), 1024).to(x.device)
@@ -493,7 +518,7 @@ class GRU_BN_4layers(nn.Module):
 
 
 class RNN_BN(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(RNN_BN, self).__init__()
         self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=2, batch_first=True)  # 修改此处
         self.bn = nn.BatchNorm1d(1024)
@@ -515,6 +540,9 @@ class RNN_BN(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'RNN_BN'
 
     def forward(self, x):
         h0 = torch.zeros(2, x.size(0), 1024).to(x.device)
@@ -546,7 +574,7 @@ class RNN_BN(nn.Module):
 
 
 class RNN_BN_3layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(RNN_BN_3layers, self).__init__()
         self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)  # 修改此处
         self.bn = nn.BatchNorm1d(1024)
@@ -568,6 +596,9 @@ class RNN_BN_3layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'RNN_BN_3layers'
 
     def forward(self, x):
         h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
@@ -599,7 +630,7 @@ class RNN_BN_3layers(nn.Module):
 
 
 class RNN_BN_4layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(RNN_BN_4layers, self).__init__()
         self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=4, batch_first=True)  # 修改此处
         self.bn = nn.BatchNorm1d(1024)
@@ -621,6 +652,9 @@ class RNN_BN_4layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'RNN_BN_4layers'
 
     def forward(self, x):
         h0 = torch.zeros(4, x.size(0), 1024).to(x.device)
@@ -688,7 +722,7 @@ class ResBlock(nn.Module):
 
 
 class BiLSTM_BN_ResBlock(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_ResBlock, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=2, batch_first=True,
                             bidirectional=True)
@@ -703,6 +737,9 @@ class BiLSTM_BN_ResBlock(nn.Module):
         self.bn4 = nn.BatchNorm1d(8)  # 批标准化层
 
         self.fc5 = nn.Linear(8, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_ResBlock'
 
     def forward(self, x):
         # print(x.shape)
@@ -727,7 +764,7 @@ class BiLSTM_BN_ResBlock(nn.Module):
 
 
 class GRU_BN_ResBlock(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(GRU_BN_ResBlock, self).__init__()
         self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=2, batch_first=True)
         self.bn = nn.BatchNorm1d(1024)
@@ -741,6 +778,9 @@ class GRU_BN_ResBlock(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'GRU_BN_ResBlock'
 
     def forward(self, x):
         h0 = torch.zeros(2, x.size(0), 1024).to(x.device)
@@ -764,7 +804,7 @@ class GRU_BN_ResBlock(nn.Module):
 
 
 class RNN_BN_ResBlock(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(RNN_BN_ResBlock, self).__init__()
         self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=2, batch_first=True)  # 修改此处
         self.bn = nn.BatchNorm1d(1024)
@@ -778,6 +818,9 @@ class RNN_BN_ResBlock(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'RNN_BN_ResBlock'
 
     def forward(self, x):
         h0 = torch.zeros(2, x.size(0), 1024).to(x.device)
@@ -801,7 +844,7 @@ class RNN_BN_ResBlock(nn.Module):
 
 
 class BiLSTM_BN_ResBlock_3layers(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_ResBlock_3layers, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=3, batch_first=True,
                             bidirectional=True)
@@ -816,6 +859,9 @@ class BiLSTM_BN_ResBlock_3layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(8)  # 批标准化层
 
         self.fc5 = nn.Linear(8, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_ResBlock_3layers'
 
     def forward(self, x):
         # print(x.shape)
@@ -840,8 +886,8 @@ class BiLSTM_BN_ResBlock_3layers(nn.Module):
 
 
 class GRU_BN_ResBlock_3layers(nn.Module):
-    def __init__(self):
-        super(GRU_BN_ResBlock, self).__init__()
+    def __init__(self, Feature_number):
+        super(GRU_BN_ResBlock_3layers, self).__init__()
         self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)
         self.bn = nn.BatchNorm1d(1024)
 
@@ -854,6 +900,9 @@ class GRU_BN_ResBlock_3layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'GRU_BN_ResBlock_3layers'
 
     def forward(self, x):
         h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
@@ -877,8 +926,8 @@ class GRU_BN_ResBlock_3layers(nn.Module):
 
 
 class RNN_BN_ResBlock_3layers(nn.Module):
-    def __init__(self):
-        super(RNN_BN_ResBlock, self).__init__()
+    def __init__(self, Feature_number):
+        super(RNN_BN_ResBlock_3layers, self).__init__()
         self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)  # 修改此处
         self.bn = nn.BatchNorm1d(1024)
 
@@ -891,6 +940,9 @@ class RNN_BN_ResBlock_3layers(nn.Module):
         self.bn4 = nn.BatchNorm1d(16)  # 批标准化层
 
         self.fc5 = nn.Linear(16, 1)
+
+    def __str__(self):
+        return 'RNN_BN_ResBlock_3layers'
 
     def forward(self, x):
         h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
@@ -914,7 +966,7 @@ class RNN_BN_ResBlock_3layers(nn.Module):
 
 
 class Custom(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(Custom, self).__init__()
         self.fc5 = nn.Linear(5, 1)
 
@@ -925,12 +977,15 @@ class Custom(nn.Module):
 
 
 class BiLSTM_BN_single(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(BiLSTM_BN_single, self).__init__()
         self.lstm = nn.LSTM(input_size=Feature_number, hidden_size=128, num_layers=3, batch_first=True,
                             bidirectional=True)
         self.bn = nn.BatchNorm1d(256)
         self.fc5 = nn.Linear(256, 1)
+
+    def __str__(self):
+        return 'BiLSTM_BN_single'
 
     def forward(self, x):
         # print(x.shape)
@@ -946,11 +1001,14 @@ class BiLSTM_BN_single(nn.Module):
 
 
 class GRU_BN_single(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(GRU_BN_single, self).__init__()
         self.gru = nn.GRU(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)
         self.bn = nn.BatchNorm1d(1024)
         self.fc5 = nn.Linear(1024, 1)
+
+    def __str__(self):
+        return 'GRU_BN_single'
 
     def forward(self, x):
         h0 = torch.zeros(3, x.size(0), 1024).to(x.device)
@@ -965,11 +1023,14 @@ class GRU_BN_single(nn.Module):
 
 
 class RNN_BN_single(nn.Module):
-    def __init__(self):
+    def __init__(self, Feature_number):
         super(RNN_BN_single, self).__init__()
         self.rnn = nn.RNN(Feature_number, hidden_size=1024, num_layers=3, batch_first=True)  # 修改此处
         self.bn = nn.BatchNorm1d(1024)
         self.fc5 = nn.Linear(1024, 1)
+
+    def __str__(self):
+        return 'RNN_BN_single'
 
     def forward(self, x):
         h0 = torch.zeros(3, x.size(0), 1024).to(x.device)

@@ -102,7 +102,7 @@ class BalancedData:
         labels_balanced = self.labels
         return data_balanced, labels_balanced
 
-    def sample(self, method='oversample'):
+    def sample(self, method):
         """
         根据指定方法进行采样
         """

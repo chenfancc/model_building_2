@@ -17,7 +17,7 @@ class TrainModel:
 
     def __init__(self, my_model_name, model, hyperparameters, train_loader, valid_loader=None, test_loader=None,
                  optimizer_class=torch.optim.Adam, criterion_class=nn.BCELoss, scheduler_class=StepLR,
-                 valid=True, save_model_index=None, root_dir=None):
+                 valid=True, save_model_index=None, root_dir=None, Feature_number=5):
         """
         初始化训练
         :param my_model_name: 模型名称
@@ -45,7 +45,7 @@ class TrainModel:
         self.GAMMA_LOSS = hyperparameters.get("GAMMA_LOSS")
 
         self.model_name = my_model_name
-        self.model = model()
+        self.model = model(Feature_number=Feature_number)
         self.train_dataloader = train_loader
         self.valid_dataloader = valid_loader
         self.test_dataloader = test_loader
